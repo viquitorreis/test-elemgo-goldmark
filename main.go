@@ -19,22 +19,75 @@ func main() {
 
 	posts := readMarkdownPosts("posts")
 	createIndexPage(posts)
+
+	// c, err := readConf("conf.yaml")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// fmt.Printf("conf: %#v\n", c.Conf.Languages)
 }
 
 func layout(title string, content elem.Node) string {
+	bodyStyle := styles.Props{
+		styles.Margin: "0",
+	}
+
 	headerStyle := styles.Props{
 		styles.BackgroundColor: "lightblue",
-		styles.Color:           "white",
 		styles.Padding:         "10px",
 		styles.TextAlign:       "center",
+		attrs.Class:            "grid grid-cols-2",
 	}
 
 	footerStyle := styles.Props{
 		styles.BackgroundColor: "lightgrey",
-		styles.Color:           "black",
 		styles.Padding:         "10px",
 		styles.TextAlign:       "center",
 	}
+
+	headerContent := elem.Div(attrs.Props(headerStyle),
+		elem.Div(attrs.Props{attrs.Class: "flex justify-center items-center"},
+			elem.A(attrs.Props{attrs.Href: "./index.html"}, elem.Text("Home page")),
+			elem.Button(attrs.Props{attrs.Class: "bg-blue-500 rounded-lg w-24 h-12", attrs.ID: "click-here"}, elem.Text("Click here")),
+		),
+		elem.Div(nil,
+			elem.Select(nil,
+				elem.Option(attrs.Props{attrs.Class: "flex justify-center items-center px-4 cursor-pointer", attrs.Value: "pt-BR"},
+					elem.Text("Português"),
+				),
+
+				elem.Option(attrs.Props{attrs.Class: "flex justify-center items-center px-4 cursor-pointer", attrs.Value: "en"},
+					elem.Text("English"),
+				),
+			),
+		),
+	)
+
+	footerContent := elem.Div(
+		attrs.Props{attrs.Style: "", attrs.Class: "grid grid-cols-3"},
+		elem.Div(nil,
+			elem.Ul(nil,
+				elem.Li(nil, elem.Text("Item 1")),
+				elem.Li(nil, elem.Text("Item 2")),
+				elem.Li(nil, elem.Text("Item 3")),
+			),
+		),
+		elem.Div(nil,
+			elem.Ul(nil,
+				elem.Li(nil, elem.Text("Item 4")),
+				elem.Li(nil, elem.Text("Item 5")),
+				elem.Li(nil, elem.Text("Item 6")),
+			),
+		),
+		elem.Div(nil, elem.Text("Footer third content here"),
+			elem.Ul(nil,
+				elem.Li(nil, elem.Text("Item 7")),
+				elem.Li(nil, elem.Text("Item 8")),
+				elem.Li(nil, elem.Text("Item 9")),
+			),
+		),
+	)
 
 	mainStyle := styles.Props{
 		styles.Padding: "20px",
@@ -43,16 +96,22 @@ func layout(title string, content elem.Node) string {
 	htmlPage := elem.Html(nil,
 		elem.Head(nil,
 			elem.Title(nil, elem.Text(title)),
+			elem.Meta(attrs.Props{attrs.Charset: "UTF-8"}),
+			// elem.Link(attrs.Props{attrs.Rel: "stylesheet", attrs.Href: "styles.css"}),
+			elem.Meta(attrs.Props{attrs.Name: "viewport", attrs.Content: "width=device-width, initial-scale=1.0"}),
+			elem.Script(attrs.Props{attrs.Src: "https://cdn.tailwindcss.com/"}),
+			elem.Script(attrs.Props{attrs.Src: "../js/main.js"}),
 		),
-		elem.Body(nil,
+		elem.Body(
+			attrs.Props{attrs.Style: bodyStyle.ToInline(), attrs.Class: "text-blue-800"},
 			elem.Header(attrs.Props{attrs.Style: headerStyle.ToInline()},
-				elem.H1(nil, elem.Text(title)),
+				headerContent,
 			),
 			elem.Main(attrs.Props{attrs.Style: mainStyle.ToInline()},
 				content,
 			),
 			elem.Footer(attrs.Props{attrs.Style: footerStyle.ToInline()},
-				elem.Text("Footer content here"),
+				footerContent,
 			),
 		),
 	)
